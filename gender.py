@@ -126,7 +126,7 @@ def main():
             print(' ' + person + ': ' + str(mentions[person]))
         print()
 
-        data.append([males_tot, females_tot])
+        data.append([len(males), len(females)])
     return females_tot, males_tot
 
 def gender_classify_name(name):
