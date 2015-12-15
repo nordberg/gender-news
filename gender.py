@@ -10,6 +10,7 @@ DEBUG = False
 he = ['he', 'him', 'man', 'his', 'mr']
 she = ['she', 'her', 'woman', 'ms']
 prev_word = ['the'] # Words that do not appear before names
+data = []
 
 def main():
     males_tot = 0
@@ -20,15 +21,14 @@ def main():
     with open(DATABASE, 'r') as f:
         articles = f.readlines()
 
-    for url in articles:
+    for i, url in enumerate(articles):
         article = newspaper.Article(url, language='en')
 
         article.download()
 
         article.parse()
-
-        print('-----------------')
         print('Processing: ' + article.title)
+        print('URL: ' + url)
 
         text = nltk.word_tokenize(article.text)
 
@@ -42,7 +42,7 @@ def main():
         for i, word in enumerate(text):
             if i == 0 or i == len(text)-1:
                 continue
-            trigram = [text[i-1], word, text[i+1]]
+            bigram = [word, text[i+1]]
 
             #tag = nltk.pos_tag([word])
 
@@ -81,8 +81,8 @@ def main():
                 continue
 
             surname = ''
-            if trigram[2][0].isupper():
-                surname = trigram[2]
+            if bigram[1][0].isupper():
+                surname = bigram[1]
                 text[i+1] = 'SURNAME'
             else:
                 continue
@@ -124,9 +124,9 @@ def main():
         print('Mentions: ')
         for person in mentions:
             print(' ' + person + ': ' + str(mentions[person]))
-        print('-----------------')
         print()
-        print()
+
+        data.append([males_tot, females_tot])
     return females_tot, males_tot
 
 def gender_classify_name(name):
@@ -138,8 +138,10 @@ def gender_classify_name(name):
 
 f,m = main()
 
-print('*-**--**--**--**--**-*')
+print('(--------------------)')
 print('(       SUMMARY      )')
-print('Total women: ' + str(f))
-print('Total men: ' + str(m))
-print('Ratio: ' + str(f/(f + m)))
+print('( Total women: ' + str(f) + '\t)')
+print('( Total men: ' + str(m) + '\t)')
+print('( Ratio: ' + str(f/(f + m)) + '\t)')
+print('(--------------------)')
+print(str(data))
